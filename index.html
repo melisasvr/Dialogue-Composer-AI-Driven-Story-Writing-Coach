@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Driven Dialogue Composer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .input-panel, .output-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .character-setup {
+            margin-bottom: 25px;
+        }
+
+        .character-form {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .slider-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .slider-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .slider-item input[type="range"] {
+            width: 100%;
+        }
+
+        .slider-value {
+            font-size: 12px;
+            color: #718096;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .dialogue-input {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .analysis-results {
+            display: none;
+        }
+
+        .analysis-results.show {
+            display: block;
+        }
+
+        .analysis-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .cliche-warning {
+            background: #fed7d7;
+            border-left-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        .alternatives-section {
+            background: #e6fffa;
+            border-left-color: #38b2ac;
+            margin-bottom: 15px;
+        }
+
+        .alternatives-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .alternatives-list li {
+            background: white;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .alternatives-list li:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .improved-versions {
+            background: #f0fff4;
+            border-left-color: #38a169;
+        }
+
+        .character-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .character-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .character-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .voice-trait {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .trait-bar {
+            width: 60px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .trait-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+
+        .scene-context {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .tension-meter {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .tension-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #ed8936, #e53e3e);
+            transition: width 0.3s;
+        }
+
+        .emoji {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tone-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .tone-angry { background: #fed7d7; color: #742a2a; }
+        .tone-sad { background: #bee3f8; color: #2a69ac; }
+        .tone-happy { background: #c6f6d5; color: #22543d; }
+        .tone-fearful { background: #fbb6ce; color: #97266d; }
+        .tone-sarcastic { background: #faf089; color: #744210; }
+        .tone-romantic { background: #fed7e2; color: #97266d; }
+        .tone-mysterious { background: #d6d3e5; color: #553c9a; }
+        .tone-aggressive { background: #fed7d7; color: #742a2a; }
+        .tone-defensive { background: #fef5e7; color: #975a16; }
+        .tone-neutral { background: #e2e8f0; color: #4a5568; }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .slider-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 AI-Driven Dialogue Composer</h1>
+            <p>Transform clichéd dialogue into fresh, character-specific alternatives</p>
+        </div>
+
+        <!-- Scene Context Setup -->
+        <div class="scene-context">
+            <h2 class="section-title">
+                <span class="emoji">🎬</span>
+                Scene Context
+            </h2>
+            <div class="form-group">
+                <label>Setting:</label>
+                <input type="text" id="setting" placeholder="e.g., Police station interrogation room" value="Police station interrogation room">
+            </div>
+            <div class="form-group">
+                <label>Mood:</label>
+                <select id="mood">
+                    <option value="tense" selected>Tense</option>
+                    <option value="romantic">Romantic</option>
+                    <option value="mysterious">Mysterious</option>
+                    <option value="comedic">Comedic</option>
+                    <option value="dramatic">Dramatic</option>
+                    <option value="casual">Casual</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tension Level: <span id="tension-display">8</span>/10</label>
+                <input type="range" id="tension" min="1" max="10" value="8" oninput="updateTensionDisplay()">
+                <div class="tension-meter">
+                    <div class="tension-fill" id="tension-fill" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <h2 class="section-title">
+                    <span class="emoji">✍️</span>
+                    Character & Dialogue Input
+                </h2>
+
+                <!-- Character Setup -->
+                <div class="character-setup">
+                    <h3>Add Character</h3>
+                    <div class="character-form">
+                        <div class="form-group">
+                            <label>Character Name:</label>
+                            <input type="text" id="character-name" placeholder="e.g., Sarah">
+                        </div>
+                        
+                        <div class="slider-group">
+                            <div class="slider-item">
+                                <label>Formality</label>
+                                <input type="range" id="formality" min="0" max="100" value="50">
+                                <div class="slider-value" id="formality-val">Neutral (50%)</div>
+                            </div>
+                            <div class="slider-item">
+                                <label>Verbosity</label>
+                                <input type="range" id="verbosity" min="0" max="100" value="50">
+                                <div class="slider-value" id="verbosity-val">Moderate (50%)</div>
+                            </div>
+                            <div class="slider-item">
+                                <label>Emotion Intensity</label>
+                                <input type="range" id="emotion" min="0" max="100" value="50">
+                                <div class="slider-value" id="emotion-val">Balanced (50%)</div>
+                            </div>
+                            <div class="slider-item">
+                                <label>Interruption Tendency</label>
+                                <input type="range" id="interruption" min="0" max="100" value="30">
+                                <div class="slider-value" id="interruption-val">Low (30%)</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-small" onclick="addCharacter()">Add Character</button>
+                    </div>
+                </div>
+
+                <!-- Dialogue Input -->
+                <div class="dialogue-input">
+                    <div class="form-group">
+                        <label>Speaker:</label>
+                        <select id="speaker">
+                            <option value="">Select character...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dialogue:</label>
+                        <textarea id="dialogue-text" rows="3" placeholder="Enter dialogue with potential clichés..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Context (optional):</label>
+                        <input type="text" id="context" placeholder="e.g., defensive response">
+                    </div>
+                    <button class="btn" onclick="analyzeDialogue()">🔍 Analyze & Generate Alternatives</button>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="output-panel">
+                <h2 class="section-title">
+                    <span class="emoji">📊</span>
+                    Analysis & Alternatives
+                </h2>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing dialogue...</p>
+                </div>
+
+                <div class="analysis-results" id="results">
+                    <p style="color: #718096; text-align: center; padding: 40px;">
+                        Enter dialogue above to see analysis and alternatives
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character Stats -->
+        <div class="character-stats" id="character-stats">
+            <!-- Character cards will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Dialogue Composer JavaScript Implementation
+        class DialogueComposer {
+            constructor() {
+                this.characters = {};
+                this.dialogueHistory = [];
+                this.sceneContext = null;
+                this.clichePatterns = [
+                    "think outside the box", "loose cannon", "perfect storm", "can of worms",
+                    "what goes around comes around", "dead as a doornail", "plenty of fish in the sea",
+                    "ignorance is bliss", "like a kid in a candy store", "you can't judge a book by its cover",
+                    "in the nick of time", "beating a dead horse", "time heals all wounds", "money talks",
+                    "actions speak louder than words", "the calm before the storm", "diamond in the rough",
+                    "blessing in disguise", "caught red-handed", "break a leg"
+                ];
+                
+                this.clicheAlternatives = {
+                    "think outside the box": [
+                        "find a new angle", "break the pattern", "try something unexpected",
+                        "look at it differently", "challenge the assumptions"
+                    ],
+                    "loose cannon": [
+                        "unpredictable force", "wild card", "walking disaster", "chaos magnet", "human hurricane"
+                    ],
+                    "perfect storm": [
+                        "worst-case scenario", "everything going wrong at once", "complete disaster",
+                        "catastrophic alignment", "nightmare convergence"
+                    ],
+                    "can of worms": [
+                        "messy situation", "complicated problem", "tangled mess", "rabbit hole", "minefield"
+                    ],
+                    "what goes around comes around": [
+                        "karma catches up", "actions have consequences", "the universe balances things out",
+                        "payback time", "justice finds a way"
+                    ],
+                    "dead as a doornail": [
+                        "completely lifeless", "stone cold", "gone for good", "finished", "beyond saving"
+                    ],
+                    "plenty of fish in the sea": [
+                        "other opportunities out there", "not the only option", "more chances ahead",
+                        "different paths to explore", "other doors will open"
+                    ],
+                    "ignorance is bliss": [
+                        "sometimes not knowing is better", "knowledge can be a burden", "the truth hurts",
+                        "some things are better left unknown", "reality can be harsh"
+                    ],
+                    "like a kid in a candy store": [
+                        "absolutely thrilled", "overwhelmed with excitement", "eyes wide with wonder",
+                        "spoiled for choice", "drunk on possibilities"
+                    ],
+                    "you can't judge a book by its cover": [
+                        "appearances can be deceiving", "there's more than meets the eye",
+                        "looks don't tell the whole story", "first impressions can be wrong", "scratch the surface"
+                    ],
+                    "in the nick of time": [
+                        "just barely made it", "cutting it close", "with seconds to spare",
+                        "at the last possible moment", "pulled it off somehow"
+                    ],
+                    "beating a dead horse": [
+                        "pointless argument", "wasted effort", "going in circles", "talking to a wall",
+                        "spitting in the wind"
+                    ],
+                    "time heals all wounds": [
+                        "pain fades with distance", "eventually you'll move past this", "wounds close, scars remain",
+                        "grief softens over time", "the sharp edges wear down"
+                    ],
+                    "money talks": [
+                        "cash opens doors", "wealth has influence", "dollars make decisions",
+                        "financial power speaks", "wealth commands attention"
+                    ],
+                    "actions speak louder than words": [
+                        "show, don't tell", "prove it through deed", "words are cheap",
+                        "demonstration beats declaration", "talk is meaningless without action"
+                    ]
+                };
+
+                this.toneKeywords = {
+                    "angry": ["furious", "rage", "damn", "hell", "angry", "mad", "pissed", "livid", "hate"],
+                    "sad": ["tears", "crying", "hurt", "broken", "lost", "empty", "alone", "depressed", "sob"],
+                    "happy": ["amazing", "wonderful", "fantastic", "love", "joy", "excited", "thrilled", "delighted"],
+                    "fearful": ["scared", "terrified", "afraid", "nightmare", "panic", "dangerous", "worried", "anxious"],
+                    "sarcastic": ["oh great", "fantastic", "wonderful", "sure", "right", "obviously", "brilliant", "perfect"],
+                    "romantic": ["love", "heart", "beautiful", "forever", "soul", "kiss", "darling", "honey", "sweetheart"],
+                    "mysterious": ["secret", "hidden", "shadow", "whisper", "unknown", "strange", "curious", "enigma"],
+                    "aggressive": ["fight", "kill", "destroy", "attack", "war", "battle", "crush", "defeat"],
+                    "defensive": ["told you", "already", "didn't do", "wasn't me", "innocent", "prove it"]
+                };
+            }
+            
+            addCharacter(name, voicePatterns) {
+                this.characters[name] = {
+                    name: name,
+                    voicePatterns: voicePatterns,
+                    dialogueCount: 0,
+                    avgSentenceLength: 0,
+                    tones: {}
+                };
+            }
+            
+            setSceneContext(setting, mood, tension) {
+                this.sceneContext = {
+                    setting: setting,
+                    mood: mood,
+                    tensionLevel: tension,
+                    charactersPresent: Object.keys(this.characters),
+                    plotPoints: []
+                };
+            }
+            
+            detectCliches(text) {
+                const detected = [];
+                const textLower = text.toLowerCase();
+                
+                for (const pattern of this.clichePatterns) {
+                    if (textLower.includes(pattern)) {
+                        detected.push({
+                            pattern: pattern,
+                            originalPhrase: this.extractOriginalPhrase(text, pattern)
+                        });
+                    }
+                }
+                
+                return detected;
+            }
+            
+            extractOriginalPhrase(text, pattern) {
+                const regex = new RegExp(pattern, 'gi');
+                const match = text.match(regex);
+                return match ? match[0] : pattern;
+            }
+            
+            generateAlternatives(speaker, cliches) {
+                const alternatives = [];
+                
+                for (const cliche of cliches) {
+                    const baseAlts = this.clicheAlternatives[cliche.pattern] || [];
+                    const characterAdapted = this.adaptToCharacterVoice(speaker, baseAlts);
+                    
+                    alternatives.push({
+                        originalPhrase: cliche.originalPhrase,
+                        alternatives: baseAlts,
+                        characterVoiceAdapted: characterAdapted
+                    });
+                }
+                
+                return alternatives;
+            }
+            
+            adaptToCharacterVoice(speaker, alternatives) {
+                if (!this.characters[speaker]) return alternatives;
+                
+                const character = this.characters[speaker];
+                const patterns = character.voicePatterns;
+                
+                return alternatives.map(alt => {
+                    let adapted = alt;
+                    
+                    if (patterns.formality > 0.7) {
+                        adapted = this.makeFormal(adapted);
+                    } else if (patterns.formality < 0.3) {
+                        adapted = this.makeCasual(adapted);
+                    }
+                    
+                    if (patterns.emotionIntensity > 0.7) {
+                        adapted = this.addEmotionalIntensity(adapted);
+                    }
+                    
+                    if (patterns.verbosity > 0.7) {
+                        adapted = this.makeVerbose(adapted);
+                    } else if (patterns.verbosity < 0.3) {
+                        adapted = this.makeTerse(adapted);
+                    }
+                    
+                    return adapted;
+                });
+            }
+            
+            makeFormal(text) {
+                return text
+                    .replace(/can't/gi, "cannot")
+                    .replace(/won't/gi, "will not")
+                    .replace(/don't/gi, "do not")
+                    .replace(/it's/gi, "it is")
+                    .replace(/that's/gi, "that is");
+            }
+            
+            makeCasual(text) {
+                return text
+                    .replace(/cannot/gi, "can't")
+                    .replace(/will not/gi, "won't")
+                    .replace(/do not/gi, "don't")
+                    .replace(/it is/gi, "it's")
+                    .replace(/that is/gi, "that's");
+            }
+            
+            addEmotionalIntensity(text) {
+                if (!text.includes('!')) {
+                    text = text.replace(/\.$/, '!');
+                }
+                
+                if (Math.random() < 0.4) {
+                    const intensifiers = ["absolutely", "completely", "totally", "damn"];
+                    const intensifier = intensifiers[Math.floor(Math.random() * intensifiers.length)];
+                    text = text.replace(/\b(wrong|right|good|bad|terrible|awful)\b/gi, `${intensifier} $1`);
+                }
+                
+                return text;
+            }
+            
+            makeVerbose(text) {
+                const expansions = {
+                    "bad": "absolutely terrible",
+                    "good": "quite excellent", 
+                    "big": "enormously large",
+                    "small": "remarkably tiny",
+                    "fast": "incredibly quick",
+                    "slow": "painfully sluggish"
+                };
+                
+                for (const [simple, verbose] of Object.entries(expansions)) {
+                    text = text.replace(new RegExp(`\\b${simple}\\b`, 'gi'), verbose);
+                }
+                
+                return text;
+            }
+            
+            makeTerse(text) {
+                return text
+                    .replace(/\b(quite|rather|very|really|absolutely|incredibly|remarkably|painfully)\s+/gi, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+            
+            analyzeTone(text) {
+                const textLower = text.toLowerCase();
+                const toneScores = {};
+                
+                for (const [tone, keywords] of Object.entries(this.toneKeywords)) {
+                    const score = keywords.reduce((count, keyword) => {
+                        return count + (textLower.includes(keyword) ? 1 : 0);
+                    }, 0);
+                    
+                    if (score > 0) {
+                        toneScores[tone] = score;
+                    }
+                }
+                
+                if (Object.keys(toneScores).length === 0) return "neutral";
+                
+                return Object.keys(toneScores).reduce((a, b) => 
+                    toneScores[a] > toneScores[b] ? a : b
+                );
+            }
+            
+            analyzeDialogue(speaker, text, context = "") {
+                const cliches = this.detectCliches(text);
+                const alternatives = this.generateAlternatives(speaker, cliches);
+                const tone = this.analyzeTone(text);
+                
+                const words = text.split(/\s+/).length;
+                const sentences = (text.match(/[.!?]+/g) || []).length || 1;
+                const pacingScore = this.calculatePacingScore(text);
+                
+                const improvedVersions = this.generateImprovedVersions(text, alternatives, speaker);
+                
+                this.updateCharacterStats(speaker, text, tone);
+                
+                return {
+                    speaker: speaker,
+                    text: text,
+                    tone: tone,
+                    pacingScore: pacingScore,
+                    clichesDetected: cliches,
+                    alternatives: alternatives,
+                    improvedVersions: improvedVersions,
+                    voiceGuidance: this.getVoiceGuidance(speaker),
+                    context: context
+                };
+            }
+            
+            calculatePacingScore(text) {
+                const sentences = (text.match(/[.!?]+/g) || []).length || 1;
+                const words = text.split(/\s+/).length;
+                const avgSentenceLength = words / sentences;
+                const idealLength = 8;
+                const lengthScore = 1 - Math.abs(avgSentenceLength - idealLength) / idealLength;
+                const variety = sentences > 1 ? 0.7 : 0.5;
+                return (variety * 0.6 + lengthScore * 0.4).toFixed(2);
+            }
+            
+            generateImprovedVersions(originalText, alternatives, speaker) {
+                const versions = [];
+                const maxVersions = 3;
+                
+                for (let i = 0; i < maxVersions; i++) {
+                    let improved = originalText;
+                    
+                    for (const alt of alternatives) {
+                        if (i < alt.characterVoiceAdapted.length) {
+                            const replacement = alt.characterVoiceAdapted[i];
+                            improved = improved.replace(new RegExp(alt.originalPhrase, 'gi'), replacement);
+                        }
+                    }
+                    
+                    if (this.characters[speaker]) {
+                        const patterns = this.characters[speaker].voicePatterns;
+                        
+                        if (patterns.interruptionTendency > 0.6 && Math.random() < 0.3) {
+                            improved = this.addInterruptions(improved);
+                        }
+                    }
+                    
+                    improved = improved.replace(/\s+/g, ' ').trim();
+                    if (improved !== originalText && !versions.includes(improved)) {
+                        versions.push(improved);
+                    }
+                }
+                
+                return versions;
+            }
+            
+            addInterruptions(text) {
+                const interruptions = ["—", "...", "—wait,", "—no,"];
+                const interruption = interruptions[Math.floor(Math.random() * interruptions.length)];
+                
+                const words = text.split(' ');
+                if (words.length > 3) {
+                    const insertIndex = Math.floor(words.length / 2);
+                    words.splice(insertIndex, 0, interruption);
+                    return words.join(' ');
+                }
+                
+                return text;
+            }
+            
+            getVoiceGuidance(speaker) {
+                if (!this.characters[speaker]) return ["Character not established yet"];
+                
+                const patterns = this.characters[speaker].voicePatterns;
+                const guidance = [];
+                
+                if (patterns.formality > 0.7) {
+                    guidance.push("Maintain formal speech patterns - avoid contractions and slang");
+                } else if (patterns.formality < 0.3) {
+                    guidance.push("Keep it casual - use contractions and informal language");
+                }
+                
+                if (patterns.emotionIntensity > 0.7) {
+                    guidance.push("Character is emotionally expressive - use strong language and punctuation");
+                } else if (patterns.emotionIntensity < 0.3) {
+                    guidance.push("Character is emotionally restrained - keep tone measured");
+                }
+                
+                if (patterns.verbosity > 0.7) {
+                    guidance.push("Character tends to elaborate - use descriptive language");
+                } else if (patterns.verbosity < 0.3) {
+                    guidance.push("Character is direct and concise - keep it brief");
+                }
+                
+                return guidance.length > 0 ? guidance : ["Character voice patterns established"];
+            }
+            
+            updateCharacterStats(speaker, text, tone) {
+                if (!this.characters[speaker]) return;
+                
+                const character = this.characters[speaker];
+                character.dialogueCount += 1;
+                
+                const sentences = (text.match(/[.!?]+/g) || []).length || 1;
+                const words = text.split(/\s+/).length;
+                const currentAvgLength = words / sentences;
+                
+                character.avgSentenceLength = (
+                    (character.avgSentenceLength * (character.dialogueCount - 1) + currentAvgLength) 
+                    / character.dialogueCount
+                ).toFixed(1);
+                
+                character.tones[tone] = (character.tones[tone] || 0) + 1;
+                
+                this.dialogueHistory.push({
+                    speaker: speaker,
+                    text: text,
+                    tone: tone,
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            getCharacterSummary(speaker) {
+                if (!this.characters[speaker]) {
+                    return { error: `Character ${speaker} not found` };
+                }
+                
+                const character = this.characters[speaker];
+                const tones = Object.entries(character.tones)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .reduce((obj, [tone, count]) => {
+                        obj[tone] = count;
+                        return obj;
+                    }, {});
+                
+                return {
+                    name: character.name,
+                    dialogueCount: character.dialogueCount,
+                    avgSentenceLength: character.avgSentenceLength,
+                    commonTones: tones,
+                    voicePatterns: character.voicePatterns
+                };
+            }
+            
+            getContextSuggestions() {
+                if (!this.sceneContext) return ["Set scene context for targeted advice"];
+                
+                const suggestions = [];
+                
+                if (this.sceneContext.tensionLevel > 7) {
+                    suggestions.push("High tension - use shorter, urgent dialogue");
+                } else if (this.sceneContext.tensionLevel < 3) {
+                    suggestions.push("Low tension - allow longer, contemplative dialogue");
+                }
+                
+                if (this.sceneContext.mood === "romantic") {
+                    suggestions.push("Romantic scene - focus on subtext and emotional vulnerability");
+                } else if (this.sceneContext.mood === "mysterious") {
+                    suggestions.push("Mysterious mood - use hints and implications");
+                }
+                
+                return suggestions.length > 0 ? suggestions : ["Scene context set"];
+            }
+        }
+
+        // Initialize the composer
+        const composer = new DialogueComposer();
+
+        // Initialize with demo characters
+        composer.addCharacter("Sarah", {
+            formality: 0.3,
+            verbosity: 0.6,
+            emotionIntensity: 0.8,
+            interruptionTendency: 0.4
+        });
+        composer.addCharacter("Detective Martinez", {
+            formality: 0.8,
+            verbosity: 0.4,
+            emotionIntensity: 0.2,
+            interruptionTendency: 0.1
+        });
+        composer.addCharacter("Tommy", {
+            formality: 0.1,
+            verbosity: 0.3,
+            emotionIntensity: 0.6,
+            interruptionTendency: 0.6
+        });
+
+        // Update speaker dropdown
+        function updateSpeakerDropdown() {
+            const speakerSelect = document.getElementById('speaker');
+            speakerSelect.innerHTML = '<option value="">Select character...</option>';
+            Object.keys(composer.characters).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                speakerSelect.appendChild(option);
+            });
+        }
+
+        // Update character stats display
+        function updateCharacterStats() {
+            const statsContainer = document.getElementById('character-stats');
+            statsContainer.innerHTML = '';
+            
+            Object.keys(composer.characters).forEach(name => {
+                const summary = composer.getCharacterSummary(name);
+                if (summary.error) return;
+                
+                const card = document.createElement('div');
+                card.className = 'character-card';
+                card.innerHTML = `
+                    <div class="character-name">${summary.name}</div>
+                    <div class="voice-trait">
+                        <span>Dialogue Lines:</span>
+                        <span>${summary.dialogueCount}</span>
+                    </div>
+                    <div class="voice-trait">
+                        <span>Avg Sentence Length:</span>
+                        <span>${summary.avgSentenceLength} words</span>
+                    </div>
+                    <div class="voice-trait">
+                        <span>Common Tones:</span>
+                        <span>${Object.keys(summary.commonTones).join(', ') || 'None'}</span>
+                    </div>
+                    <div class="voice-trait">
+                        <span>Formality:</span>
+                        <div class="trait-bar"><div class="trait-fill" style="width: ${summary.voicePatterns.formality * 100}%"></div></div>
+                    </div>
+                    <div class="voice-trait">
+                        <span>Verbosity:</span>
+                        <div class="trait-bar"><div class="trait-fill" style="width: ${summary.voicePatterns.verbosity * 100}%"></div></div>
+                    </div>
+                    <div class="voice-trait">
+                        <span>Emotion:</span>
+                        <div class="trait-bar"><div class="trait-fill" style="width: ${summary.voicePatterns.emotionIntensity * 100}%"></div></div>
+                    </div>
+                `;
+                statsContainer.appendChild(card);
+            });
+        }
+
+        // Update tension display
+        function updateTensionDisplay() {
+            const tension = document.getElementById('tension').value;
+            document.getElementById('tension-display').textContent = tension;
+            document.getElementById('tension-fill').style.width = `${tension * 10}%`;
+        }
+
+        // Update slider values
+        function updateSliderValue(id, value) {
+            const display = document.getElementById(`${id}-val`);
+            let label = '';
+            if (id === 'formality') {
+                label = value > 70 ? 'Formal' : value < 30 ? 'Casual' : 'Neutral';
+            } else if (id === 'verbosity') {
+                label = value > 70 ? 'Verbose' : value < 30 ? 'Terse' : 'Moderate';
+            } else if (id === 'emotion') {
+                label = value > 70 ? 'Intense' : value < 30 ? 'Flat' : 'Balanced';
+            } else if (id === 'interruption') {
+                label = value > 70 ? 'High' : value < 30 ? 'Low' : 'Moderate';
+            }
+            display.textContent = `${label} (${value}%)`;
+        }
+
+        // Event listeners for sliders
+        ['formality', 'verbosity', 'emotion', 'interruption'].forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                updateSliderValue(id, e.target.value);
+            });
+        });
+
+        // Add character
+        function addCharacter() {
+            const name = document.getElementById('character-name').value.trim();
+            if (!name) {
+                alert('Please enter a character name');
+                return;
+            }
+            if (composer.characters[name]) {
+                alert('Character already exists');
+                return;
+            }
+            
+            const voicePatterns = {
+                formality: document.getElementById('formality').value / 100,
+                verbosity: document.getElementById('verbosity').value / 100,
+                emotionIntensity: document.getElementById('emotion').value / 100,
+                interruptionTendency: document.getElementById('interruption').value / 100
+            };
+            
+            composer.addCharacter(name, voicePatterns);
+            updateSpeakerDropdown();
+            updateCharacterStats();
+            
+            // Reset form
+            document.getElementById('character-name').value = '';
+            ['formality', 'verbosity', 'emotion', 'interruption'].forEach(id => {
+                document.getElementById(id).value = id === 'interruption' ? 30 : 50;
+                updateSliderValue(id, document.getElementById(id).value);
+            });
+        }
+
+        // Analyze dialogue
+        function analyzeDialogue() {
+            const speaker = document.getElementById('speaker').value;
+            const text = document.getElementById('dialogue-text').value.trim();
+            const context = document.getElementById('context').value.trim();
+            
+            if (!speaker || !text) {
+                alert('Please select a speaker and enter dialogue text');
+                return;
+            }
+            
+            // Update scene context
+            const setting = document.getElementById('setting').value;
+            const mood = document.getElementById('mood').value;
+            const tension = parseInt(document.getElementById('tension').value);
+            composer.setSceneContext(setting, mood, tension);
+            
+            // Show loading
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            
+            setTimeout(() => {
+                const analysis = composer.analyzeDialogue(speaker, text, context);
+                const contextSuggestions = composer.getContextSuggestions();
+                
+                // Render results
+                let html = `
+                    <div class="analysis-card">
+                        <h3>Original Dialogue</h3>
+                        <p><strong>${analysis.speaker}:</strong> "${analysis.text}"</p>
+                        <p>Tone: <span class="tone-badge tone-${analysis.tone}">${analysis.tone}</span></p>
+                        <p>Pacing Score: ${analysis.pacingScore}</p>
+                        ${analysis.context ? `<p>Context: ${analysis.context}</p>` : ''}
+                    </div>
+                `;
+                
+                if (analysis.clichesDetected.length > 0) {
+                    html += `
+                        <div class="analysis-card cliche-warning">
+                            <h3>Clichés Detected (${analysis.clichesDetected.length})</h3>
+                            <ul>
+                                ${analysis.clichesDetected.map(cliche => `<li>"${cliche.originalPhrase}"</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                if (analysis.alternatives.length > 0) {
+                    html += `
+                        <div class="analysis-card alternatives-section">
+                            <h3>Fresh Alternatives</h3>
+                            ${analysis.alternatives.map(alt => `
+                                <div>
+                                    <p><strong>Cliché:</strong> "${alt.originalPhrase}"</p>
+                                    <ul class="alternatives-list">
+                                        ${alt.characterVoiceAdapted.map((a, i) => `<li>${i + 1}. "${a}"</li>`).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                if (analysis.improvedVersions.length > 0) {
+                    html += `
+                        <div class="analysis-card improved-versions">
+                            <h3>Improved Versions</h3>
+                            <ul class="alternatives-list">
+                                ${analysis.improvedVersions.map((v, i) => `<li>${i + 1}. "${v}"</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="analysis-card">
+                        <h3>Voice Guidance</h3>
+                        <ul>
+                            ${analysis.voiceGuidance.map(g => `<li>${g}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="analysis-card">
+                        <h3>Context-Aware Suggestions</h3>
+                        <ul>
+                            ${contextSuggestions.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                
+                results.innerHTML = html;
+                results.classList.add('show');
+                results.classList.add('fade-in');
+                loading.style.display = 'none';
+                
+                updateCharacterStats();
+            }, 500); // Simulate processing delay
+        }
+
+        // Initialize
+        updateSpeakerDropdown();
+        updateCharacterStats();
+        updateTensionDisplay();
+    </script>
+</body>
+</html>
